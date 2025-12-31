@@ -1,195 +1,53 @@
-111101000101 sune
-111100011000 antisune
-111100111001 T
-111110101000 L
-111100001111 H
-111100000110 PI
-111101100011 U
+{
+    "f2ls": {
+        "00U": "U R U' R' U2 R U' R'",
+        "00F": "U' R U R' U2 R U' R'",
+        "00R": "R U R'",
+        "01U": "L F' L' U2 L F L'",
+        "01F": "U' R U' R' U F' U' F",
+        "01R": "L' B2 R2 B R2 B L",
+        "10U": "R U' R' U2 R U R'",
+        "10F": "U' R U2 R' U2 R U' R'",
+        "10R": "U' R U R' U R U R'",
+        "11U": "U' F' U2 F U' F' U F",
+        "11F": "F' U' F",
+        "11R": "U' L F' R' F R F L'",
+        "20U": "U2 R2 U2 R' U' R U' R2",
+        "20F": "F' U F U2 R U R'",
+        "20R": "R' U2 R2 U R2 U R",
+        "21U": "F' U2 F U F' U' F",
+        "21F": "U F' U F U' F' U' F                       ",
+        "21R": "U' F' U F",
+        "30U": "R U2 R' U' R U R'",
+        "30F": "U R U' R'",
+        "30R": "R U' R' U2 F' U' F",
+        "31U": "F U R U' R' F' R U' R'",
+        "31F": "U' R U2 R' U F' U' F",
+        "31R": "U' R U' R' U R U R'",
+        "40U": "R2 D B2 D' R2",
+        "40F": "U L U' L' R U' R'",
+        "40R": "U' L U L' R U R'",
+        "41U": "U2 F' L U' F L'",
+        "41F": "L F' U' F L'",
+        "41R": "B' R U R' B",
+        "50U": "U L' R U2 R' L",
+        "50F": "y' R U R2 U' R y",
+        "50R": "U' L' U L R U R'",
+        "51U": "L F' L' F U2 R U R'",
+        "51F": "L' F' U' F L",
+        "51R": "U2 L' U L F' U2 F",
+        "60U": "R U R' U' R U R' U' R U R' U'",
+        "60F": "U' R U' R' U2 R U' R'",
+        "60R": "U R U R' U2 R U R'",
+        "61U": "R U' R' F' U2 F",
+        "61F": "U' R U R' U F' U' F",
+        "61R": "U F' U' F U' R U R'",
+        "70U": "U' R' U R2 U' R'",
+        "70F": "y R U' R' L' U' L y'",
+        "70R": "R' U' R2 U R'",
+        "71U": "R' U' R L F' L' U2 L F L'",
+        "71F": "R' U2 R F' U' F",
+        "71R": "R' U R U' F' U' F",
+    }
 
-010110100010 S
-010101010001 LEFTY_S
-110011000110 ANTI-COUCH
-100100111001 COUCH
-110011000000 P
-100100110000 ANTI-P
-110001010001 W
-110001010100 ANTI-W
-110000000110 2xFRURUF
-110000000011 L2xFRURUF
-110000000000 NR_MIRROR
-110000001111 NR
-
-110000001001 CANTIN_R'F"
-011000001001 CANTIN_R'F"asdsa
-
-100100101010 lfs
-110001000101 fs
-
-100100011000 S
-110010000100 LS
-100100100001
-110001000010
-
-110000101010 KITE
-110000100001
-
-001110101000
-110010101000
-
-110000111001
-110001100000
-110001100011
-110000110000
-110011110000
-
-
---------------------------
-T-SHAPES010100110000
-010100110000
-010100000000
-010100001001
-010101000101
-010101000101
-010100100001
-010100000011
-010101100000
-010100111001
-101011000000
-010101000010
-010100101010
-010111110000
-111111110000
-100100111001
-010100001111
-000011110000
-000001100000
-000000000000
-000000000110
-000010000100
-000000011000
-000001100011
-000010100010
-001110100010
-000000001001
-000000001001
-000000001100
-000000000110
-000000000011
-000001010001
-000001010001
-000010101000
-000001010100
-000010100010
-011000001100
-011000001100
-110000000110
-100100000011
-001100001001
-011001100011
-011001100011
-110011000000
-100110011100
-001100110000
-001100011000
-001100011000
-011000101010
-110001000010
-100110001010
-101010101000
-010101010100
-101010100010
-010101010001
-
-def pll_hash_gen():
-    color_values = {"red": 0, "green": 1, "blue": 2, "orange": 3}
-
-    stickers = [
-        logic.cube["L"][0][0],
-        logic.cube["L"][0][1],
-        logic.cube["L"][0][2],
-        logic.cube["F"][0][0],
-        logic.cube["F"][0][1],
-        logic.cube["F"][0][2],
-    ]
-
-    hash = []
-
-    for s in stickers:
-        hash.append(color_values[s])
-    print(hash)
-    return hash
-
-
-def get_pll_perm_hash():
-    # while logic.cube["F"][0][1] != logic.cube["F"][1][1]:
-    #     logic.execute("U")
-
-    edge_pos_map = {"UB": "1", "UL": "2", "UR": "3"}
-    corner_pos_map = {"UBL": "1", "UFL": "2", "UFR": "3", "UBR": "4"}
-
-    perm_hash = ""
-
-    for colors, name in YELLOW_EDGES:
-        if name == "UF":
-            continue
-        current_pos = logic.find_edge_position(colors)
-        perm_hash += edge_pos_map.get(current_pos, "0")
-
-    perm_hash += "_"
-
-    for colors, name in YELLOW_CORNERS:
-        current_pos = logic.find_corner_position(colors)
-        perm_hash += corner_pos_map.get(current_pos, "0")
-
-    print(f"Generated PLL Hash: {perm_hash}")
-    return perm_hash
-def solve_PLL():
-    for _ in range(4):
-        current_hash = pll_hash_gen()
-        for _ in range(4):
-            print("".join(str(c) for c in current_hash))
-            if "".join(str(c) for c in current_hash) in ALGS["CFOP"]["PLL_MAP"]:
-                logic.execute(
-                    ALGS["CFOP"]["PLL"][
-                        ALGS["CFOP"]["PLL_MAP"]["".join(str(c) for c in current_hash)]
-                    ]
-                )
-                break
-            else:
-                for j in range(len(current_hash)):
-                    current_hash[j] = (current_hash[j] + 1) % 4
-        logic.execute("U")
-
-    while logic.cube["F"][0][1] != logic.cube["F"][1][1]:
-        logic.execute("U")
-
-
-VVVVVVVVVVVVVVVVVVV
-022111210101
-111002121210
-200111012121
-111220101012
-
-Naaaaaaaaaaaaaaaaaa
-200111022111
-111200111022
-022111200111
-111022111200
-
-Nbbbbbbbbbbbbbbbbbb
-002111220111
-111002111220
-220111002111
-111220111002
-
-EEEEEEEEEEEEEEEEEEE
-121210101012
-012101210121
-101012121210
-210121012101
-
-YYYYYYYYYYYYYYYYYYY
-012111200121
-121002111210
-210111022101
-101220111012
+}

@@ -110,7 +110,7 @@ def handle_move(move_func):
 
 
 root = tk.Tk()
-root.geometry("1480x780+1000+500")
+root.geometry("1580x780+1000+500")
 root.title("Rubik's cube solver")
 
 
@@ -179,8 +179,8 @@ chart_widget_LBL.place(x=370, y=550)
 def update_chart():
     method = solver.METHOD
     if method == "CFOP":
-        if not movecount_table_CFOP:
-            return
+        # if not movecount_table_CFOP:
+        #     return
 
         ax.clear()
 
@@ -217,6 +217,33 @@ def update_chart():
         ax_2.grid(True, alpha=0.3)
 
         chart_canvas_LBL.draw()
+
+def reset_charts():
+    global movecount_table
+    global movecount_table_CFOP
+    global movecount_table_LBL
+    global flag_showed_reco
+    global already_solved
+    initial_method = solver.METHOD
+    movecount_table = [0]
+    movecount_table_CFOP = [0]
+    movecount_table_LBL = [0]
+    flag_showed_reco = False
+    already_solved = False
+    ax.clear()
+    ax_2.clear()
+    solver.METHOD = "LBL"
+    update_chart()
+    solver.METHOD = "CFOP"
+    update_chart()
+    logic.movecount = 0
+    update_label()
+    solver.METHOD = initial_method
+    flag_showed_reco = True
+    already_solved = True
+    movecount_table = []
+    movecount_table_CFOP = []
+    movecount_table_LBL = []
 
 
 def create_btn(txt, cmd, r, c, bg_color="yellow", w=7):
@@ -278,7 +305,7 @@ def pick_method(method):
 
     elif method == "CFOP":
         create_btn(
-            "F2L", lambda: handle_solve_step(solver.solve_F2L), 1, 4, "spring green"
+            "F2L", lambda: handle_solve_step(solver.solve_f2l_smart), 1, 4, "spring green"
         )
         create_btn(
             "OLL", lambda: handle_solve_step(solver.solve_OLL), 2, 4, "spring green"
@@ -306,11 +333,11 @@ def pick_method(method):
         )
 
 
-method_buttonframe.place(x=off_x + 950, y=300)
+method_buttonframe.place(x=off_x + 750, y=300)
 method_button_LBL = tk.Button(
     method_buttonframe,
     text="LBL",
-    font=("Arial", 26),
+    font=("Arial", 22),
     width=7,
     command=lambda: pick_method("LBL"),
     bg="bisque1",
@@ -318,13 +345,23 @@ method_button_LBL = tk.Button(
 method_button_CFOP = tk.Button(
     method_buttonframe,
     text="CFOP",
-    font=("Arial", 26),
+    font=("Arial", 22),
     width=7,
     command=lambda: pick_method("CFOP"),
     bg="spring green",
 )
-method_button_LBL.pack(side="left", padx=5)
-method_button_CFOP.pack(side="left", padx=45)
+reset_buttonframe = tk.Button(
+    method_buttonframe,
+    text="RESET STATS",
+    font=("Arial", 22),
+    width=10,
+    command=lambda: reset_charts(),
+    bg="red",
+
+)
+reset_buttonframe.pack(side="left")
+method_button_LBL.pack(side="left", padx=50)
+method_button_CFOP.pack(side="left")
 
 
 def retrieve_input(event=None):

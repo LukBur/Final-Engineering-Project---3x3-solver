@@ -1,7 +1,7 @@
 import cube_logic as logic
 import json
 import time
-
+import cube_data as data
 
 def load_algs():
     with open("steps.json", "r", encoding="utf-8") as f:
@@ -25,10 +25,10 @@ WHITE_CORNERS_STEPS = [
 ]
 
 F2L_EDGES = [
-    ({"green", "orange"}, "FR"),
-    ({"blue", "orange"}, "BR"),
+    ({"green", "orange"}, "FL"),
+    ({"orange", "blue"}, "BR"),
     ({"blue", "red"}, "BL"),
-    ({"green", "red"}, "FL"),
+    ({"red", "green"}, "FL"),
 ]
 
 YELLOW_EDGES = [
@@ -137,8 +137,53 @@ def solve_f2l_edges():
     with open("recons.txt", "a", encoding="utf-8") as f:
         f.write(f"F2L Edges: {' '.join(alg)}\n")
 
+def solve_f2l_smart():
 
-f2l_alg = []
+    for i, ((corner_colors, _), (edge_colors, _)) in enumerate(zip(WHITE_CORNERS_STEPS, F2L_EDGES)):
+        f2l_hash = ""
+        alg = []
+        corner_pos = logic.find_corner_position(corner_colors)
+        move = ALGS[METHOD]["corners"][corner_pos]
+        logic.execute(move)
+        alg.extend(move.split())
+
+        # edge_placement = {"UB": "0", "UL": "1", "UF": "2", "UR": "3", "BL": "4", "FL": "5", "FR": "6", "BR": "7"}
+        
+        edge_placement = {"UB": "001", "UL": "110", "UF": "221", "UR": "312", "BL": "412", "FL": "510", "FR": "612", "BR": "710"}
+        current_edge_pos = logic.find_edge_position(edge_colors)
+        color = current_edge_pos[0]
+        face = logic.find_edge_position(edge_colors)[0]
+        x = int(edge_placement[current_edge_pos][1])
+        y = int(edge_placement[current_edge_pos][2])
+        color1 = logic.get_physical_edge_colors(current_edge_pos)
+        # print(x, y)
+
+        color = logic.cube[face][x][y]
+        # for i in range(0,len(F2L_EDGES)-1):
+        # color1, _ = F2L_EDGES[i][0]
+        f2l_hash += edge_placement[logic.find_edge_position(edge_colors)][0]
+        
+
+        # logic.get_physical_edge_colors()[0]
+        if color == logic.cube["F"][1][1]:
+            f2l_hash += "0"
+        else:
+            f2l_hash += "1"
+        if logic.cube["U"][2][2] =="white":
+            f2l_hash += "U"
+        elif logic.cube["F"][0][2] == "white":
+            f2l_hash += "F"
+        else:
+            f2l_hash += "R"
+        print(color, " ", f2l_hash)
+
+        f2l_alg = ALGS["CFOP"]["F2L_algs"][f2l_hash]
+        logic.execute(f2l_alg)
+        alg.extend(f2l_alg.split())
+        logic.execute("y")
+        alg.append("y")
+        with open("recons.txt", "a", encoding="utf-8") as f:
+            f.write(f"Pair {i+1}: {' '.join(alg)}\n")
 
 
 def solve_F2L():
@@ -499,21 +544,9 @@ def solve_OLL():
         if oll_hash in oll_map:
             case_name = oll_map[oll_hash]
             logic.execute(ALGS["CFOP"]["OLL"][case_name])
-            # alg.extend(ALGS["CFOP"]["OLL"][case_name].split())
-            # preauf = " ".join(preauf)
-            # print(
-            #     f"OLL Solved: {case_name}: ({preauf}) {ALGS['CFOP']['OLL'][case_name]}"
-            # )
-
-            # with open("recons.txt", "a", encoding="utf-8") as f:
-            #     f.write(f"OLL: {' '.join(alg)}\n")
-            # return True
             break
         logic.execute("U")
         count += 1
-        # alg.append("U")
-        # preauf.append("U")
-
     if count % 4 == 1:
         alg.append("U")
     elif count % 4 == 2:
@@ -521,7 +554,6 @@ def solve_OLL():
     elif count % 4 == 3:
         alg.append("U'")
 
-    # logic.execute(ALGS["CFOP"]["OLL"][oll_map[oll_hash]])
     alg.extend(ALGS["CFOP"]["OLL"][case_name].split())
 
     with open("recons.txt", "a", encoding="utf-8") as f:
@@ -808,6 +840,6 @@ def solve_cube_CFOP():
 
     # solve_f2l_edges()
 
-    solve_F2L()
+    solve_f2l_smart()
     solve_OLL()
     solve_PLL()
