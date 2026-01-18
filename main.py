@@ -1,4 +1,7 @@
 import tkinter as tk
+import time
+import os
+import psutil
 from cube_data import cube
 import cube_logic as logic
 import cube_solver as solver
@@ -59,6 +62,7 @@ def update_label():
 
             flag_showed_reco = True
             already_solved = True
+
             # logic.movecount = 0
 
     else:
@@ -67,23 +71,83 @@ def update_label():
         already_solved = False
 
 
+def test_10_times():
+    test_100()
+
+
 def test_100():
     global min_movecount, max_movecount, already_solved, flag_showed_reco
-
+    sum_time = 0
+    num_solves = 1000
+    sum_cpu = 0
+    sum_ram = 0
+    max_cpu = 0
+    process = psutil.Process(os.getpid())
+    start = time.time()
     if solver.METHOD == "CFOP":
-        for _ in range(99):
+        # i = 1
+        for _ in range(num_solves - 1):
             already_solved = False
             flag_showed_reco = False
+            start_time = time.perf_counter()
 
+            cpu_usage_total = process.cpu_percent(interval=None) / psutil.cpu_count()
+            ram_usage = process.memory_info().rss / (1024 * 1024)
+            sum_cpu += cpu_usage_total
+            sum_ram += ram_usage
+            if cpu_usage_total > max_cpu:
+                max_cpu = cpu_usage_total
+            # sum_cpu_usage += cpu_usage
             logic.scramble_logic()
             handle_solve_step(solver.solve_cube_CFOP)
+
+            end_time = time.perf_counter()
+            elapsed_time = end_time - start_time
+            sum_time += elapsed_time
+            # print(
+            #     f"Ułożenie: {i + 1} | Czas: {elapsed_time:.3f}s, CPU: {cpu_usage:.1f}%, RAM: {ram_usage:.1f}MB"
+            # )
+            # i += 1
+
     else:
-        for _ in range(99):
+        # i = 1
+        for _ in range(num_solves - 1):
             already_solved = False
             flag_showed_reco = False
 
+            start_time = time.perf_counter()
+
+            cpu_usage_total = process.cpu_percent(interval=None) / psutil.cpu_count()
+            ram_usage = process.memory_info().rss / (1024 * 1024)
+            sum_cpu += cpu_usage_total
+            sum_ram += ram_usage
+            if cpu_usage_total > max_cpu:
+                max_cpu = cpu_usage_total
+            # cpu_usage = psutil.cpu_percent(interval=0.005)
+            # ram_usage = psutil.virtual_memory().used / (1024 * 1024)
+            # sum_cpu_usage += cpu_usage
             logic.scramble_logic()
             handle_solve_step(solver.solve_cube_LBL)
+
+            end_time = time.perf_counter()
+            elapsed_time = end_time - start_time
+            sum_time += elapsed_time
+            # print(
+            #     f"Ułożenie: {i + 1} | Czas: {elapsed_time:.3f}s, CPU: {cpu_usage:.1f}%, RAM: {ram_usage:.1f}MB"
+            # )
+            # i += 1
+    avg_cpu = sum_cpu / num_solves
+    avg_ram = sum_ram / num_solves
+    end = time.time()
+    print(f"Time for 100 solves with {solver.METHOD} method: {(end - start)}\n ")
+    print(
+        f"Average time for {num_solves} solves with {sum_time / num_solves} method: {solver.METHOD}\n "
+    )
+    print(f"cpu_usage: {cpu_usage_total}\n ")
+    print(f"RAM_usage: {ram_usage}\n ")
+
+    print(f"Średnie CPU: {avg_cpu:.2f}% | Maksymalne CPU: {max_cpu:.2f}%")
+    print(f"Średnie RAM dla {solver.METHOD}: {avg_ram:.2f} MB")
 
 
 def show_movecount_table():
@@ -115,12 +179,14 @@ root.title("Rubik's cube solver")
 
 
 # UI
-label_cubestate = tk.Label(root, text="Good luck!", font=("Times New Roman", 16))
+label_cubestate = tk.Label(
+    root, text="Rubik's cube solver", font=("Times New Roman", 16)
+)
 # label_scramble()
-label_movecount = tk.Label(root, text="twojtekst", font=("Times New Roman", 16))
+label_movecount = tk.Label(root, text="No solves done", font=("Times New Roman", 16))
 label_instruction = tk.Label(
     root,
-    text="Welcome to The 3x3 Learning App! \n Pick your method: (LBL, CFOP)",
+    text="Welcome to The 3x3 Solving App! \n Pick your method: (LBL, CFOP)",
     font=("Times New Roman", 22),
 )
 label_cubestate.pack(padx=20, pady=20)
@@ -210,13 +276,14 @@ def update_chart():
         avg = sum(movecount_table_LBL) / len(movecount_table_LBL)
         ax_2.axhline(y=avg, color="r", linestyle="--", label=f"Avg: {avg:.1f}")
 
-        ax_2.set_title("Movecount chart")
+        ax_2.set_title("LBL movecount chart")
         ax_2.set_xlabel("Solve")
         ax_2.set_ylabel("Movecount")
         ax_2.legend(loc="upper right", fontsize="small")
         ax_2.grid(True, alpha=0.3)
 
         chart_canvas_LBL.draw()
+
 
 def reset_charts():
     global movecount_table
@@ -292,7 +359,9 @@ def pick_method(method):
         )
         create_btn("UCROSS", lambda: handle_solve_step(solver.eo), 3, 4, "bisque1")
         create_btn("EOLL", lambda: handle_solve_step(solver.eo), 3, 4, "bisque1")
-        create_btn("COLL", lambda: handle_solve_step(solver.coll), 4, 4, "bisque1")
+        create_btn(
+            "COLL", lambda: handle_solve_step(solver.solve_coll), 4, 4, "bisque1"
+        )
         create_btn("CPLL", lambda: handle_solve_step(solver.cpll), 5, 4, "bisque1")
         create_btn("EPLL", lambda: handle_solve_step(solver.epll), 6, 4, "bisque1")
         create_btn(
@@ -305,7 +374,7 @@ def pick_method(method):
 
     elif method == "CFOP":
         create_btn(
-            "F2L", lambda: handle_solve_step(solver.solve_f2l_smart), 1, 4, "spring green"
+            "F2L", lambda: handle_solve_step(solver.solve_f2l), 1, 4, "spring green"
         )
         create_btn(
             "OLL", lambda: handle_solve_step(solver.solve_OLL), 2, 4, "spring green"
@@ -352,12 +421,11 @@ method_button_CFOP = tk.Button(
 )
 reset_buttonframe = tk.Button(
     method_buttonframe,
-    text="RESET STATS",
+    text="RESET",
     font=("Arial", 22),
     width=10,
     command=lambda: reset_charts(),
     bg="red",
-
 )
 reset_buttonframe.pack(side="left")
 method_button_LBL.pack(side="left", padx=50)
@@ -438,7 +506,7 @@ moves_map = [
     # ("UCROSS", lambda: handle_solve_step(solver.eo), 3, 6),
     # ("OLL", lambda: handle_solve_step(solver.solve_OLL), 4, 6),
     # ("CPLL", lambda: handle_solve_step(solver.cpll), 5, 5),
-    ("test 100", lambda: handle_solve_step(test_100), 0, 3, "light yellow"),
+    ("test 100", lambda: handle_solve_step(test_10_times), 0, 3, "light yellow"),
 ]
 
 for txt, cmd, r, col, color in moves_map:

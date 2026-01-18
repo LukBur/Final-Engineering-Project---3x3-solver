@@ -2,6 +2,8 @@ import cube_logic as logic
 import json
 import time
 import cube_data as data
+import cProfile
+
 
 def load_algs():
     with open("steps.json", "r", encoding="utf-8") as f:
@@ -137,9 +139,11 @@ def solve_f2l_edges():
     with open("recons.txt", "a", encoding="utf-8") as f:
         f.write(f"F2L Edges: {' '.join(alg)}\n")
 
-def solve_f2l_smart():
 
-    for i, ((corner_colors, _), (edge_colors, _)) in enumerate(zip(WHITE_CORNERS_STEPS, F2L_EDGES)):
+def solve_f2l():
+    for i, ((corner_colors, _), (edge_colors, _)) in enumerate(
+        zip(WHITE_CORNERS_STEPS, F2L_EDGES)
+    ):
         f2l_hash = ""
         alg = []
         corner_pos = logic.find_corner_position(corner_colors)
@@ -148,34 +152,37 @@ def solve_f2l_smart():
         alg.extend(move.split())
 
         # edge_placement = {"UB": "0", "UL": "1", "UF": "2", "UR": "3", "BL": "4", "FL": "5", "FR": "6", "BR": "7"}
-        
-        edge_placement = {"UB": "001", "UL": "110", "UF": "221", "UR": "312", "BL": "412", "FL": "510", "FR": "612", "BR": "710"}
+
+        edge_placement = {
+            "UB": "001",
+            "UL": "110",
+            "UF": "221",
+            "UR": "312",
+            "BL": "412",
+            "FL": "510",
+            "FR": "612",
+            "BR": "710",
+        }
         current_edge_pos = logic.find_edge_position(edge_colors)
         color = current_edge_pos[0]
         face = logic.find_edge_position(edge_colors)[0]
         x = int(edge_placement[current_edge_pos][1])
         y = int(edge_placement[current_edge_pos][2])
-        color1 = logic.get_physical_edge_colors(current_edge_pos)
-        # print(x, y)
 
         color = logic.cube[face][x][y]
-        # for i in range(0,len(F2L_EDGES)-1):
-        # color1, _ = F2L_EDGES[i][0]
         f2l_hash += edge_placement[logic.find_edge_position(edge_colors)][0]
-        
 
-        # logic.get_physical_edge_colors()[0]
+        # logic.get_edge_colors()[0]
         if color == logic.cube["F"][1][1]:
             f2l_hash += "0"
         else:
             f2l_hash += "1"
-        if logic.cube["U"][2][2] =="white":
+        if logic.cube["U"][2][2] == "white":
             f2l_hash += "U"
         elif logic.cube["F"][0][2] == "white":
             f2l_hash += "F"
         else:
             f2l_hash += "R"
-        print(color, " ", f2l_hash)
 
         f2l_alg = ALGS["CFOP"]["F2L_algs"][f2l_hash]
         logic.execute(f2l_alg)
@@ -183,7 +190,7 @@ def solve_f2l_smart():
         logic.execute("y")
         alg.append("y")
         with open("recons.txt", "a", encoding="utf-8") as f:
-            f.write(f"Pair {i+1}: {' '.join(alg)}\n")
+            f.write(f"Pair {i + 1}: {' '.join(alg)}\n")
 
 
 def solve_F2L():
@@ -291,7 +298,7 @@ def eo():
         f.write(f"Yellow cross: {' '.join(alg)}\n")
 
 
-def coll():
+def solve_coll():
     global preauf
     alg = []
     while not is_yellow_face_solved():
@@ -493,44 +500,6 @@ def pll_hash_gen():
     # print("".join(str(h) for h in hash))
     return "".join(str(h) for h in hash)
 
-    # for pll in PLLS.values():
-    #     fix_cube_orientation()
-    #     logic.execute("z")
-    #     logic.execute("z")
-    #     logic.execute(pll)
-    #     hash = []
-    #     for s in stickers:
-    #         hash.append(color_values[s])
-    # print(hash)
-    #     solve_cube_LBL()
-
-    # return hash
-
-
-PLLS = {
-    "T": "R U R' U' R' F R2 U' R' U' R U R' F'",
-    "Ja": "R' U2 R U R' U2 L U' R U L'",
-    "Jb": "R U R' F' R U R' U' R' F R2 U' R' U'",
-    "F": "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R",
-    "Aa": "x R' U R' D2 R U' R' D2 R2 x'",
-    "Ab": "x R2 D2 R U R' D2 R U' R x'",
-    "Ra": "R U R' F' R U2 R' U2 R' F R U R U2 R' U'",
-    "Rb": "R2 F R U R U' R' F' R U2 R' U2 R U",
-    "Ga": "R2 U R' U R' U' R U' R2 D U' R' U R D'",
-    "Gb": "D R' U' R U D' R2 U R' U R U' R U' R2",
-    "Gc": "R2 U' R U' R U R' U R2 D' U R U' R' D",
-    "Gd": "R U R' U' D R2 U' R U' R' U R' U R2 D'",
-    "Y": "F R U' R' U' R U R' F' R U R' U' R' F R F'",
-    "E": "x' R U' R' D R U R' D' R U R' D R U' R' D' x",
-    "Na": "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'",
-    "Nb": "R' U R U' R' F' U' F R U R' F R' F' R U' R",
-    "V": "R' U R' U' R D' R' D R' U D' R2 U' R2 D R2",
-    "Ua": "R U R' U R' U' R2 U' R' U R' U R",
-    "Ub": "R' U R' U' R' U' R' U R U R2",
-    "H": "R L U2 R' L' F' B' U2 F B",
-    "Z": "R' U' R U' R U R U' R' U R U R2 U' R'",
-}
-
 
 # FRIDRICH METHOD
 def solve_OLL():
@@ -556,8 +525,12 @@ def solve_OLL():
 
     alg.extend(ALGS["CFOP"]["OLL"][case_name].split())
 
-    with open("recons.txt", "a", encoding="utf-8") as f:
-        f.write(f"OLL: {' '.join(alg)}\n")
+    if len(alg) < 5:
+        with open("recons.txt", "a", encoding="utf-8") as f:
+            f.write(f"OLL: SKIP {' '.join(alg)}\n")
+    else:
+        with open("recons.txt", "a", encoding="utf-8") as f:
+            f.write(f"OLL: {' '.join(alg)}\n")
 
 
 def AUF(side="F"):
@@ -768,7 +741,7 @@ def solve_PLL():
 
     count = 0
     found = False
-    for i in range(4):
+    for _ in range(4):
         h = pll_hash_gen()
         if h in pll_map:
             pll_name = pll_map[h]
@@ -819,6 +792,7 @@ def PLL_solved():
 
 
 def solve_cube_LBL():
+    # start = time.time()
     if logic.is_solved():
         # print("The cube can't be more solved than solved :)")
         return
@@ -826,12 +800,17 @@ def solve_cube_LBL():
     solve_f2l_corners()
     solve_f2l_edges()
     eo()
-    coll()
+    solve_coll()
     cpll()
     epll()
+    # end = time.time()
+    # print(f"Time for 100 solves with {METHOD} method: {end - start}")
+    # print(logic.is_solved_count)
+    # logic.is_solved_count = 0
 
 
 def solve_cube_CFOP():
+    # start = time.time()
     if logic.is_solved():
         # print("The cube can't be more solved than solved :)")
         return
@@ -840,6 +819,10 @@ def solve_cube_CFOP():
 
     # solve_f2l_edges()
 
-    solve_f2l_smart()
+    solve_f2l()
     solve_OLL()
     solve_PLL()
+    # end = time.time()
+    # print(f"Time for 100 solves with {METHOD} method: {end - start}")
+    # print(logic.is_solved_count)
+    # logic.is_solved_count = 0

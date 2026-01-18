@@ -18,16 +18,6 @@ corners = {
     "DBR": [("D", 2, 2), ("B", 2, 0), ("R", 2, 2)],
 }
 
-correct_corners = {
-    "UFR": {"white", "green", "red"},
-    "UFL": {"white", "green", "orange"},
-    "UBL": {"white", "blue", "orange"},
-    "UBR": {"white", "blue", "red"},
-    "DFR": {"yellow", "green", "red"},
-    "DFL": {"yellow", "green", "orange"},
-    "DBL": {"yellow", "blue", "orange"},
-    "DBR": {"yellow", "blue", "red"},
-}
 
 edges = {
     "UF": [("U", 2, 1), ("F", 0, 1)],
@@ -42,19 +32,4 @@ edges = {
     "FR": [("F", 1, 2), ("R", 1, 0)],
     "BL": [("B", 1, 2), ("L", 1, 0)],
     "BR": [("B", 1, 0), ("R", 1, 2)],
-}
-
-correct_edges = {
-    "UF": {"white", "green"},
-    "UL": {"white", "orange"},
-    "UR": {"white", "red"},
-    "UB": {"white", "blue"},
-    "DF": {"yellow", "green"},
-    "DL": {"yellow", "orange"},
-    "DR": {"yellow", "red"},
-    "DB": {"yellow", "blue"},
-    "FL": {"green", "orange"},
-    "FR": {"green", "red"},
-    "BL": {"blue", "orange"},
-    "BR": {"blue", "red"},
 }

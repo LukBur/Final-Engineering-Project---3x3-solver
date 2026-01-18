@@ -1,16 +1,16 @@
 # cube_logic.py
 import random
-from cube_data import cube, corners, edges, correct_corners, correct_edges
+from cube_data import cube, corners, edges
 import time
 import cube_solver as solver
 import copy
 
-
-def get_corner_colors(name):
-    stickers = [name]
-    for face, row, col in corners[name]:
-        stickers.append(cube[face][row][col])
-    return stickers
+movecount = 0
+# def get_corner_colors(name):
+#     stickers = [name]
+#     for face, row, col in corners[name]:
+#         stickers.append(cube[face][row][col])
+#     return stickers
 
 
 def is_solved():
@@ -339,7 +339,6 @@ mod3moves = []
 
 scramble_sequence = []
 solve_sequence = []
-movecount = 0
 
 
 def scramble_logic(num_moves=20, scramble=""):
@@ -405,7 +404,7 @@ def execute(sequence):
             solve_sequence.append(move)
 
 
-def get_physical_edge_colors(edge_name):
+def get_edge_colors(edge_name):
     pos = edges[edge_name]
     return {
         cube[pos[0][0]][pos[0][1]][pos[0][2]],
@@ -424,7 +423,7 @@ def get_physical_corner_colors(corner_name):
 
 def find_edge_position(target_colors):
     for name in edges:
-        if get_physical_edge_colors(name) == target_colors:
+        if get_edge_colors(name) == target_colors:
             return name
     return None
 
@@ -478,37 +477,37 @@ def is_edge_fully_solved(edge_name):
     return True
 
 
-def run_statistical_comparison(n=100):
-    global cube
-    results = {"LBL": [], "CFOP": [], "CFOP_wins": 0, "LBL_wins": 0, "Ties": 0}
+# def run_statistical_comparison(n=100):
+#     global cube
+#     results = {"LBL": [], "CFOP": [], "CFOP_wins": 0, "LBL_wins": 0, "Ties": 0}
 
-    for _ in range(n):
-        # 1. Generujemy scramble
-        scramble_logic()
-        scramble_state = copy.deepcopy(cube)
+#     for _ in range(n):
+#         # 1. Generujemy scramble
+#         scramble_logic()
+#         scramble_state = copy.deepcopy(cube)
 
-        # 2. Testujemy LBL
-        global solve_sequence
-        solve_sequence = []
-        solver.solve_cube_LBL()
-        lbl_count = len(solve_sequence)
-        results["LBL"].append(lbl_count)
+#         # 2. Testujemy LBL
+#         global solve_sequence
+#         solve_sequence = []
+#         solver.solve_cube_LBL()
+#         lbl_count = len(solve_sequence)
+#         results["LBL"].append(lbl_count)
 
-        # Przywracamy stan kostki
-        cube = copy.deepcopy(scramble_state)
+#         # Przywracamy stan kostki
+#         cube = copy.deepcopy(scramble_state)
 
-        # 3. Testujemy CFOP
-        solve_sequence.clear()
-        solver.solve_cube_CFOP()
-        cfop_count = len(solve_sequence)
-        results["CFOP"].append(cfop_count)
+#         # 3. Testujemy CFOP
+#         solve_sequence.clear()
+#         solver.solve_cube_CFOP()
+#         cfop_count = len(solve_sequence)
+#         results["CFOP"].append(cfop_count)
 
-        # 4. Porównujemy
-        if cfop_count < lbl_count:
-            results["CFOP_wins"] += 1
-        elif lbl_count < cfop_count:
-            results["LBL_wins"] += 1
-        else:
-            results["Ties"] += 1
+#         # 4. Porównujemy
+#         if cfop_count < lbl_count:
+#             results["CFOP_wins"] += 1
+#         elif lbl_count < cfop_count:
+#             results["LBL_wins"] += 1
+#         else:
+#             results["Ties"] += 1
 
-    return results
+#     return results
